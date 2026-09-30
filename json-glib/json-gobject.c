@@ -342,6 +342,7 @@ json_gobject_dump (GObject *gobject)
   JsonSerializable *serializable = NULL;
   gboolean list_properties = FALSE;
   gboolean serialize_property = FALSE;
+  gboolean serialize_property_key = FALSE;
   gboolean get_property = FALSE;
   JsonObject *object;
   GParamSpec **pspecs;
@@ -353,6 +354,7 @@ json_gobject_dump (GObject *gobject)
       iface = JSON_SERIALIZABLE_GET_IFACE (gobject);
       list_properties = (iface->list_properties != NULL);
       serialize_property = (iface->serialize_property != NULL);
+      serialize_property_key = (iface->serialize_property_key != NULL);
       get_property = (iface->get_property != NULL);
     }
 
@@ -375,6 +377,7 @@ json_gobject_dump (GObject *gobject)
 
       g_value_init (&value, G_PARAM_SPEC_VALUE_TYPE (pspec));
 
+
       if (get_property)
         json_serializable_get_property (serializable, pspec, &value);
       else
@@ -396,10 +399,22 @@ json_gobject_dump (GObject *gobject)
         node = json_serialize_pspec (&value, pspec);
 
       if (node)
-        json_object_set_member (object, pspec->name, node);
+      {
+        const gchar *key = pspec->name;
 
+        if (serialize_property_key)
+          key = json_serializable_serialize_property_key(serializable,
+                                                         pspec->name,
+                                                         pspec);
+        if (key != NULL)
+          json_object_set_member (object, key, node);
+        else
+          json_node_free (node);
+      }
+      
       g_value_unset (&value);
     }
+
 
   g_free (pspecs);
 

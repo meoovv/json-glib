@@ -69,6 +69,27 @@ json_serializable_serialize_property (JsonSerializable *serializable,
   return iface->serialize_property (serializable, property_name, value, pspec);
 }
 
+const gchar*
+json_serializable_serialize_property_key (JsonSerializable *serializable,
+                                      const gchar      *property_name,
+                                      GParamSpec       *pspec)
+{
+  JsonSerializableIface *iface;
+
+  g_return_val_if_fail (JSON_IS_SERIALIZABLE (serializable), NULL);
+  g_return_val_if_fail (property_name != NULL, NULL);
+  g_return_val_if_fail (pspec != NULL, NULL);
+
+  iface = JSON_SERIALIZABLE_GET_IFACE (serializable);
+
+  if (iface->serialize_property_key != NULL)
+    return iface->serialize_property_key (serializable, property_name, pspec);
+
+  return property_name;
+}
+
+
+
 /**
  * json_serializable_deserialize_property:
  * @serializable: a serializable object

@@ -68,6 +68,10 @@ struct _JsonSerializableIface
                                       const gchar      *property_name,
                                       const GValue     *value,
                                       GParamSpec       *pspec);
+  const gchar *(* serialize_property_key) (JsonSerializable *serializable,
+                                           const gchar      *property_name,
+                                           GParamSpec       *pspec);
+  
   gboolean  (* deserialize_property) (JsonSerializable *serializable,
                                       const gchar      *property_name,
                                       GValue           *value,
@@ -94,6 +98,11 @@ JsonNode *json_serializable_serialize_property           (JsonSerializable *seri
                                                           const gchar      *property_name,
                                                           const GValue     *value,
                                                           GParamSpec       *pspec);
+JSON_AVAILABLE_IN_1_0
+const gchar *json_serializable_serialize_property_key        (JsonSerializable *serializable,
+                                                          const gchar      *property_name,
+                                                          GParamSpec       *pspec);
+
 JSON_AVAILABLE_IN_1_0
 gboolean  json_serializable_deserialize_property         (JsonSerializable *serializable,
                                                           const gchar      *property_name,
